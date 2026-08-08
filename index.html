@@ -210,7 +210,40 @@ a{color:var(--p)}
 <section id="recipes"><div class="page-head"><div><h1>Tarif Veritabanı</h1><p>Hazırlama, maliyet ve hastalık etiketleri.</p></div></div><div class="panel" id="recipeList"></div></section>
 
 <section id="menuStudio"><div class="page-head"><div><h1>Akıllı Menü Stüdyosu</h1><p>Hastalık, alerji, bütçe ve tekrar kontrolü.</p></div></div>
-<div class="toolbar"><input id="menuCondition" placeholder="Hastalık / durum"><select id="menuBudget"><option value="low">Ekonomik</option><option value="medium" selected>Orta</option><option value="high">Esnek</option></select><button class="primary" onclick="generateMenu()">Menü Oluştur</button></div><div id="menuScore" class="panel" style="display:none"></div><div id="menuTable" class="panel"></div></section>
+<div class="toolbar"><input id="menuCondition" placeholder="Hastalık / durum"><select id="menuBudget"><option value="low">Ekonomik</option><option value="medium" selected>Orta</option><option value="high">Esnek</option></select><button class="primary" onclick="generateMenu()">Menü Oluştur</button></div><div id="menuScore" class="panel" style="display:none"></div>
+<div id="menuTable" class="panel"></div>
+<div id="iy112Advice" class="panel" style="margin-top:16px">
+  <div class="iy112-head">
+    <div>
+      <div class="iy112-kicker">MENÜ STÜDYOSU</div>
+      <h3>📌 Öneriler & Beslenme Notları</h3>
+      <p>Bu bölüm 1 haftalık menüyle birlikte yazdırılır.</p>
+    </div>
+    <div class="iy112-actions no-print">
+      <button type="button" id="iy112Edit">✏️ Düzenle</button>
+      <button type="button" id="iy112Add">＋ Kendi Önerimi Ekle</button>
+      <button type="button" id="iy112Save">💾 Kaydet</button>
+      <button type="button" id="iy112Print">🖨️ Menü + Önerileri Yazdır</button>
+    </div>
+  </div>
+  <div class="iy112-grid">
+    <div class="iy112-box free">
+      <h4>✓ SERBEST YİYECEKLER</h4>
+      <div id="iy112Free" class="iy112-editable"></div>
+    </div>
+    <div class="iy112-box avoid">
+      <h4>✕ YENİLMEMESİ GEREKEN YİYECEKLER</h4>
+      <div id="iy112Avoid" class="iy112-editable"></div>
+    </div>
+  </div>
+  <div class="iy112-own">
+    <div class="iy112-own-title">KENDİ ÖNERİLERİM / DANIŞANA ÖZEL NOTLAR</div>
+    <div id="iy112Rows"></div>
+    <div class="iy112-hint no-print">İleride istediğin kadar yeni madde ekleyebilir, silebilir ve düzenleyebilirsin.</div>
+  </div>
+</div>
+<div id="iy111MenuAdviceHost"></div>
+</section>
 
 <section id="tracking"><div class="page-head"><div><h1>İlerleme Analiz Merkezi</h1><p>Su, aktivite, uyku, kilo ve başarı puanı.</p></div></div>
 <div class="metrics"><div class="metric"><span>Başarı Puanı</span><b id="successScore">0</b></div><div class="metric"><span>Kayıt</span><b id="trackCount">0</b></div></div>
@@ -4593,7 +4626,7 @@ function printWeek(){
   +'th{background:#EFE8D8}.r{margin:10px 0 18px;font-size:12.5px;background:#F6F2E9;border:1px solid #D8CFB6;padding:10px}'
   +'</style></head><body><h2>Diyetisyen İlker Yelkencioğlu — 7 Günlük Kişiye Özel Menü</h2>'
   +'<div class="r"><b>Menü tarzı:</b> '+esc(STYLES[CTX.style])+' · <b>Hedef:</b> '+CTX.cal+' kcal/gün<br>'
-  +'<b>Durumlar:</b> '+(CTX.conds.length?esc(CTX.conds.map(c=>c.l).join(', ')):'—')+'</div>'+body+'</body></html>';
+  +'<b>Durumlar:</b> '+(CTX.conds.length?esc(CTX.conds.map(c=>c.l).join(', ')):'—')+'</div>'+body+(window.iy114PrintAdviceHtml?window.iy114PrintAdviceHtml():'')+'</body></html>';
  const w=window.open('','_blank');
  if(!w){const b=new Blob([html],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='7-gunluk-menu.html';a.click();return}
  w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},500);
@@ -4674,7 +4707,7 @@ function init(){
   +'<button type="button" class="v66-btn alt" id="v66Print">🖨️ 7 Günlük Menüyü Yazdır</button>'
   +'<button type="button" class="v66-btn alt" id="v66Clear">Seçimleri Temizle</button>'
   +'</div>'
-  +'<div id="v66Out"></div></div>';
+  +'<div id="v66Out"></div><div id="iy114AdviceHost"></div></div>';
 
  COND.forEach(c=>{
   const box=document.getElementById('v66c-'+c.id), lab=document.getElementById('v66l-'+c.id);
@@ -6883,5 +6916,514 @@ body.iy-v108-welcome-open #iyV108Welcome {
   }else{
     setTimeout(buildV108,550);
   }
+})();
+</script>
+
+
+
+
+
+
+<style id="iy-v111-advice">
+.iy111-advice{margin:18px 0 8px;padding:18px;border:1px solid #dbe8e2;border-radius:18px;background:linear-gradient(135deg,#fbfdfc,#f5faf7);box-shadow:0 8px 24px rgba(22,72,59,.07)}
+.iy111-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:13px}
+.iy111-head h3{margin:0;color:#17483b;font-size:17px}.iy111-actions{display:flex;gap:7px;flex-wrap:wrap}
+.iy111-actions button{padding:8px 11px;border-radius:10px;border:1px solid #d4e4dc;background:#fff;color:#245b4c;font-weight:800;cursor:pointer}
+.iy111-actions .save{background:#17483b;color:#fff;border-color:#17483b}
+.iy111-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.iy111-card{background:#fff;border:1px solid #e3ece8;border-radius:14px;padding:14px}.iy111-card.free{border-left:4px solid #318a68}.iy111-card.avoid{border-left:4px solid #b95d4d}
+.iy111-card h4{margin:0 0 8px;font-size:13px}.iy111-card.free h4{color:#27765b}.iy111-card.avoid h4{color:#9d493b}
+.iy111-text{white-space:pre-line;font-size:12.5px;line-height:1.62;color:#52615c;min-height:75px}.iy111-text[contenteditable="true"]{padding:8px;border-radius:8px;outline:2px solid #bcdacc;background:#fdfffe}
+.iy111-custom{margin-top:12px;padding:13px;background:#fff;border:1px dashed #cadbd3;border-radius:14px}.iy111-custom-title{font-weight:900;color:#315e53;font-size:12.5px}
+.iy111-row{display:flex;gap:7px;margin-top:7px}.iy111-row input{flex:1;padding:9px 10px;border:1px solid #dce6e1;border-radius:9px;font:inherit}.iy111-row button{width:34px;border:0;border-radius:9px;cursor:pointer;background:#f7ece9;color:#a34d40}
+.iy111-note{margin-top:9px;font-size:10.5px;color:#81908a}.iy111-snack-copy{margin-top:14px}
+@media(max-width:720px){.iy111-grid{grid-template-columns:1fr}}
+</style>
+
+<script id="iy-v111-advice-script">
+(function(){
+"use strict";
+const FREE_DEFAULT=`Açık çay
+Ihlamur
+Salça
+Suni tatlandırıcılar (günde 5–6 adet)`;
+
+const AVOID_DEFAULT=`• Şeker ve şekerli tatlılar, bal, reçel, pekmez, marmelat, şurup
+• Hamur işleri: börek, çörek, pasta, kek, kurabiye, çikolata
+• Alkollü içecekler ve meşrubatlar, tahin ve tahin helvası
+• Yağda kızartılmış, kavrulmuş ve sos ilave edilmiş yiyecekler
+• Kuru yemişler, hazır meyve suları, sigara
+• Sucuk, pastırma, salam, sosis
+• Bütün yağlı yiyecekler (yağlı etler, krema vb.)
+• Terkibi bilinmeyen hazır gıdalar
+• Listede belirtilmemiş olan her türlü yiyecekler
+• Margarin, tereyağı, kuyruk yağı, iç yağ
+• Sakatatlar (karaciğer, beyin, böbrek vb.)
+• Önerilenden fazla tuz ve tuzlu yiyecekler (salamura, turşu, konserve vb.)`;
+
+const K={free:"iy111_advice_free",avoid:"iy111_advice_avoid",custom:"iy111_advice_custom"};
+
+function read(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}}
+function write(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function custom(){try{return JSON.parse(localStorage.getItem(K.custom)||"[]")}catch(e){return[]}}
+function saveCustom(a){try{localStorage.setItem(K.custom,JSON.stringify(a))}catch(e){}}
+
+function renderRows(box){
+ const list=box.querySelector(".iy111-list"); if(!list)return;
+ list.innerHTML="";
+ custom().forEach((v,i)=>{
+   const r=document.createElement("div");r.className="iy111-row";
+   const inp=document.createElement("input");inp.value=v;inp.placeholder="Yeni öneri / beslenme notu...";
+   const del=document.createElement("button");del.type="button";del.textContent="×";del.title="Sil";
+   del.onclick=()=>{const a=custom();a.splice(i,1);saveCustom(a);renderRows(box)};
+   r.append(inp,del);list.appendChild(r);
+ });
+}
+
+function build(editable=true){
+ const box=document.createElement("section");box.className="iy111-advice";
+ box.innerHTML=`<div class="iy111-head">
+   <h3>📌 Öneriler & Beslenme Notları</h3>
+   ${editable?'<div class="iy111-actions"><button type="button" data-edit>✏️ Düzenle</button><button type="button" data-add>＋ Yeni Madde Ekle</button><button type="button" class="save" data-save>💾 Kaydet</button></div>':''}
+ </div>
+ <div class="iy111-grid">
+   <div class="iy111-card free"><h4>SERBEST YİYECEKLER</h4><div class="iy111-text" data-kind="free"></div></div>
+   <div class="iy111-card avoid"><h4>YENİLMEMESİ GEREKEN YİYECEKLER</h4><div class="iy111-text" data-kind="avoid"></div></div>
+ </div>
+ <div class="iy111-custom"><div class="iy111-custom-title">KENDİ ÖNERİLERİM</div><div class="iy111-list"></div><div class="iy111-note">Bu alan kalıcı olarak genişletilebilir; istediğiniz kadar yeni madde ekleyebilir, düzenleyebilir veya silebilirsiniz.</div></div>`;
+
+ box.querySelector('[data-kind="free"]').innerText=read(K.free,FREE_DEFAULT);
+ box.querySelector('[data-kind="avoid"]').innerText=read(K.avoid,AVOID_DEFAULT);
+ renderRows(box);
+
+ if(editable){
+   box.querySelector("[data-edit]").onclick=()=>{
+     box.querySelectorAll(".iy111-text").forEach(x=>x.contentEditable=x.contentEditable==="true"?"false":"true");
+   };
+   box.querySelector("[data-add]").onclick=()=>{
+     const a=custom();a.push("");saveCustom(a);renderRows(box);
+   };
+   box.querySelector("[data-save]").onclick=function(){
+     write(K.free,box.querySelector('[data-kind="free"]').innerText.trim());
+     write(K.avoid,box.querySelector('[data-kind="avoid"]').innerText.trim());
+     const a=[...box.querySelectorAll(".iy111-row input")].map(x=>x.value.trim()).filter(Boolean);
+     saveCustom(a);renderRows(box);
+     box.querySelectorAll(".iy111-text").forEach(x=>x.contentEditable="false");
+     this.textContent="✓ Kaydedildi";setTimeout(()=>this.textContent="💾 Kaydet",1200);
+     refreshSnackAdvice();
+   };
+ }
+ return box;
+}
+
+function installMenuAdvice(){
+ const host=document.getElementById("iy111MenuAdviceHost");
+ if(host && !host.querySelector(".iy111-advice")) host.appendChild(build(true));
+}
+
+function refreshSnackAdvice(){
+ const sec=document.getElementById("weeklySnacks"); if(!sec)return;
+ let host=document.getElementById("iy111SnackAdviceHost");
+ if(!host){
+   host=document.createElement("div");host.id="iy111SnackAdviceHost";host.className="iy111-snack-copy";
+   sec.appendChild(host);
+ }
+ host.innerHTML="";
+ host.appendChild(build(false));
+}
+
+function install(){
+ installMenuAdvice();
+ refreshSnackAdvice();
+
+ // weeklySnacks içerik olarak yeniden çizildiğinde öneriler tekrar alta gelsin.
+ const sec=document.getElementById("weeklySnacks");
+ if(sec && !sec.__iy111Observed){
+   sec.__iy111Observed=true;
+   new MutationObserver(()=>{
+     if(!document.getElementById("iy111SnackAdviceHost")) setTimeout(refreshSnackAdvice,30);
+   }).observe(sec,{childList:true,subtree:false});
+ }
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(install,700));
+else setTimeout(install,700);
+
+document.addEventListener("click",e=>{
+ const b=e.target.closest?.("button");
+ if(!b)return;
+ if(/menü oluştur|farklı menü|ara öğün|menü stüdyosu/i.test(b.textContent||"")) setTimeout(install,250);
+},true);
+})();
+</script>
+
+
+<style id="iy-v112-style">
+#iy112Advice{display:block!important;visibility:visible!important;opacity:1!important;padding:18px!important;border:1px solid #dce8e2!important;border-radius:18px!important;background:#f8fcfa!important}
+.iy112-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}.iy112-kicker{font-size:10px;font-weight:900;letter-spacing:.14em;color:#80918a}.iy112-head h3{margin:4px 0 3px;color:#17483b}.iy112-head p{margin:0;color:#7a8983;font-size:11px}
+.iy112-actions{display:flex;gap:7px;flex-wrap:wrap}.iy112-actions button{border:1px solid #d2e2da;background:#fff;color:#245b4c;border-radius:10px;padding:8px 10px;font-weight:800;cursor:pointer}.iy112-actions #iy112Save,.iy112-actions #iy112Print{background:#17483b;color:#fff}
+.iy112-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.iy112-box{background:#fff;border:1px solid #e3ece8;border-radius:14px;padding:14px}.iy112-box.free{border-left:4px solid #318a68}.iy112-box.avoid{border-left:4px solid #b95d4d}.iy112-box h4{margin:0 0 9px;font-size:13px}.iy112-box.free h4{color:#27765b}.iy112-box.avoid h4{color:#9d493b}
+.iy112-editable{white-space:pre-line;line-height:1.65;font-size:12.5px;color:#4e5e58;min-height:80px}.iy112-editable[contenteditable=true]{outline:2px solid #b9d8ca;padding:8px;border-radius:8px;background:#fdfffe}
+.iy112-own{margin-top:12px;padding:13px;border-radius:14px;background:#fff;border:1px dashed #cbdcd4}.iy112-own-title{font-weight:900;font-size:12px;color:#315e53}.iy112-row{display:flex;gap:7px;margin-top:7px}.iy112-row input{flex:1;border:1px solid #dce6e1;border-radius:9px;padding:9px 10px}.iy112-row button{width:34px;border:0;border-radius:9px;background:#f7ece9;color:#a34d40;cursor:pointer}.iy112-hint{margin-top:8px;font-size:10.5px;color:#82908b}
+@media(max-width:720px){.iy112-grid{grid-template-columns:1fr}}
+@media print{
+ body *{visibility:hidden!important}
+ #menuStudio,#menuStudio *,#menuTable,#menuTable *,#iy112Advice,#iy112Advice *{visibility:visible!important}
+ #menuStudio{position:absolute!important;left:0!important;top:0!important;width:100%!important;background:#fff!important}
+ #iy112Advice{display:block!important;break-inside:avoid;box-shadow:none!important;border:1px solid #bbb!important;background:#fff!important}
+ #iy112Advice .no-print,.no-print{display:none!important}
+ #iy112Advice .iy112-grid{grid-template-columns:1fr 1fr!important}
+ #iy112Advice input{border:0!important;padding:0!important}
+ aside,.sidebar,#iySideToggle,nav,header{display:none!important}
+}
+</style>
+<script id="iy-v112-script">
+(function(){
+const F=`Açık çay
+Ihlamur
+Salça
+Suni tatlandırıcılar (günde 5–6 adet)`;
+const A=`• Şeker ve şekerli tatlılar, bal, reçel, pekmez, marmelat, şurup
+• Hamur işleri: börek, çörek, pasta, kek, kurabiye, çikolata
+• Alkollü içecekler ve meşrubatlar, tahin ve tahin helvası
+• Yağda kızartılmış, kavrulmuş ve sos ilave edilmiş yiyecekler
+• Kuru yemişler, hazır meyve suları, sigara
+• Sucuk, pastırma, salam, sosis
+• Bütün yağlı yiyecekler (yağlı etler, krema vb.)
+• Terkibi bilinmeyen hazır gıdalar
+• Listede belirtilmemiş olan her türlü yiyecekler
+• Margarin, tereyağı, kuyruk yağı, iç yağ
+• Sakatatlar (karaciğer, beyin, böbrek vb.)
+• Önerilenden fazla tuz ve tuzlu yiyecekler (salamura, turşu, konserve vb.)`;
+function get(k,d){try{return localStorage.getItem("iy112_"+k)||d}catch(e){return d}}
+function set(k,v){try{localStorage.setItem("iy112_"+k,v)}catch(e){}}
+function ga(){try{return JSON.parse(localStorage.getItem("iy112_rows")||"[]")}catch(e){return[]}}
+function sa(a){try{localStorage.setItem("iy112_rows",JSON.stringify(a))}catch(e){}}
+function rows(){
+ const host=document.getElementById("iy112Rows");if(!host)return;host.innerHTML="";
+ ga().forEach((v,i)=>{const r=document.createElement("div");r.className="iy112-row";const x=document.createElement("input");x.value=v;x.placeholder="Danışana özel öneri / yeni madde...";const d=document.createElement("button");d.type="button";d.textContent="×";d.className="no-print";d.onclick=()=>{let a=ga();a.splice(i,1);sa(a);rows()};r.append(x,d);host.appendChild(r)});
+}
+function init(){
+ const box=document.getElementById("iy112Advice");if(!box)return;
+ document.getElementById("iy112Free").innerText=get("free",F);
+ document.getElementById("iy112Avoid").innerText=get("avoid",A);
+ rows();
+ document.getElementById("iy112Edit").onclick=()=>document.querySelectorAll("#iy112Advice .iy112-editable").forEach(x=>x.contentEditable=x.contentEditable==="true"?"false":"true");
+ document.getElementById("iy112Add").onclick=()=>{let a=ga();a.push("");sa(a);rows()};
+ document.getElementById("iy112Save").onclick=function(){
+   set("free",document.getElementById("iy112Free").innerText.trim());set("avoid",document.getElementById("iy112Avoid").innerText.trim());
+   sa([...document.querySelectorAll("#iy112Rows input")].map(x=>x.value.trim()).filter(Boolean));rows();
+   document.querySelectorAll("#iy112Advice .iy112-editable").forEach(x=>x.contentEditable="false");
+   this.textContent="✓ Kaydedildi";setTimeout(()=>this.textContent="💾 Kaydet",1000);
+ };
+ document.getElementById("iy112Print").onclick=()=>{document.getElementById("iy112Save").click();setTimeout(()=>window.print(),150)};
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+
+<style id="iy-v113-advice">
+#iy113Advice{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ margin:18px 0 8px;padding:18px;border:1px solid #d9e7e0;border-radius:18px;
+ background:linear-gradient(135deg,#fbfdfc,#f4faf7);box-shadow:0 8px 22px rgba(20,70,58,.06)
+}
+#iy113Advice h3{margin:0 0 4px;color:#17483b;font-size:17px}
+#iy113Advice .sub{margin:0 0 12px;color:#7c8a85;font-size:11px}
+.iy113-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.iy113-actions button{padding:8px 10px;border:1px solid #d5e3dd;background:#fff;border-radius:10px;color:#245b4c;font-weight:800;cursor:pointer}
+.iy113-actions .save,.iy113-actions .print{background:#17483b;color:white}
+.iy113-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.iy113-card{background:#fff;border:1px solid #e3ece8;border-radius:14px;padding:14px}
+.iy113-card.free{border-left:4px solid #318a68}.iy113-card.avoid{border-left:4px solid #b95d4d}
+.iy113-card h4{margin:0 0 8px;font-size:13px}.iy113-card.free h4{color:#27765b}.iy113-card.avoid h4{color:#9d493b}
+.iy113-text{white-space:pre-line;line-height:1.62;font-size:12.5px;color:#50605a;min-height:80px}
+.iy113-text[contenteditable=true]{outline:2px solid #b8d8c9;padding:8px;border-radius:8px;background:#fdfffe}
+.iy113-own{margin-top:12px;background:#fff;border:1px dashed #cadbd3;border-radius:14px;padding:13px}
+.iy113-row{display:flex;gap:7px;margin-top:7px}.iy113-row input{flex:1;padding:9px 10px;border:1px solid #dce6e1;border-radius:9px}
+.iy113-row button{width:34px;border:0;border-radius:9px;background:#f7ece9;color:#a34d40;cursor:pointer}
+.iy113-print{margin-top:14px;border:1px solid #bbb;border-radius:12px;padding:12px;background:#fff}
+.iy113-print h4{margin:0 0 7px;color:#17483b}.iy113-print ul{margin:5px 0 10px;padding-left:20px}.iy113-print li{margin:2px 0}
+@media(max-width:720px){.iy113-grid{grid-template-columns:1fr}}
+@media print{
+ #iy113Advice{display:block!important;visibility:visible!important;box-shadow:none!important;background:#fff!important;break-inside:avoid}
+ #iy113Advice .no-print{display:none!important}
+ .iy113-grid{grid-template-columns:1fr 1fr!important}
+}
+</style>
+
+<script id="iy-v113-advice-script">
+(function(){
+"use strict";
+const FREE=`Açık çay
+Ihlamur
+Salça
+Suni tatlandırıcılar (günde 5–6 adet)`;
+
+const AVOID=`Şeker ve şekerli tatlılar, bal, reçel, pekmez, marmelat, şurup
+Hamur işleri: börek, çörek, pasta, kek, kurabiye, çikolata
+Alkollü içecekler ve meşrubatlar, tahin ve tahin helvası
+Yağda kızartılmış, kavrulmuş ve sos ilave edilmiş yiyecekler
+Kuru yemişler, hazır meyve suları, sigara
+Sucuk, pastırma, salam, sosis
+Bütün yağlı yiyecekler (yağlı etler, krema vb.)
+Terkibi bilinmeyen hazır gıdalar
+Listede belirtilmemiş olan her türlü yiyecekler
+Margarin, tereyağı, kuyruk yağı, iç yağ
+Sakatatlar (karaciğer, beyin, böbrek vb.)
+Önerilenden fazla tuz ve tuzlu yiyecekler (salamura, turşu, konserve vb.)`;
+
+const K={f:"iy113_free",a:"iy113_avoid",c:"iy113_custom"};
+const get=(k,d)=>{try{return localStorage.getItem(k)||d}catch(e){return d}};
+const set=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const custom=()=>{try{return JSON.parse(localStorage.getItem(K.c)||"[]")}catch(e){return[]}};
+const saveCustom=a=>{try{localStorage.setItem(K.c,JSON.stringify(a))}catch(e){}};
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+function printHtml(){
+ const free=get(K.f,FREE).split("\n").map(x=>x.trim()).filter(Boolean);
+ const avoid=get(K.a,AVOID).split("\n").map(x=>x.replace(/^•\s*/,"").trim()).filter(Boolean);
+ const own=custom().filter(Boolean);
+ return `<section class="iy113-print">
+   <h4>Öneriler & Beslenme Notları</h4>
+   <b>SERBEST YİYECEKLER</b><ul>${free.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+   <b>YENİLMEMESİ GEREKEN YİYECEKLER</b><ul>${avoid.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+   ${own.length?`<b>DANIŞANA ÖZEL NOTLAR</b><ul>${own.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+ </section>`;
+}
+window.iy113AdvicePrintHtml=printHtml;
+
+function renderRows(box){
+ const host=box.querySelector(".iy113-rows");host.innerHTML="";
+ custom().forEach((v,i)=>{
+  const r=document.createElement("div");r.className="iy113-row";
+  const x=document.createElement("input");x.value=v;x.placeholder="Danışana özel öneri / yeni madde...";
+  const d=document.createElement("button");d.type="button";d.textContent="×";d.title="Sil";
+  d.onclick=()=>{let a=custom();a.splice(i,1);saveCustom(a);renderRows(box)};
+  r.append(x,d);host.appendChild(r);
+ });
+}
+
+function build(){
+ const box=document.createElement("div");box.id="iy113Advice";
+ box.innerHTML=`<h3>📌 Öneriler & Beslenme Notları</h3>
+ <p class="sub">Menü Stüdyosu · 1 haftalık menü ve yazdırma/PDF çıktısına dahildir.</p>
+ <div class="iy113-actions no-print">
+  <button type="button" data-edit>✏️ Düzenle</button>
+  <button type="button" data-add>＋ Yeni Madde Ekle</button>
+  <button type="button" class="save" data-save>💾 Kaydet</button>
+  <button type="button" class="print" data-print>🖨️ Yazdır / PDF</button>
+ </div>
+ <div class="iy113-grid">
+  <div class="iy113-card free"><h4>✓ SERBEST YİYECEKLER</h4><div class="iy113-text" data-kind="f"></div></div>
+  <div class="iy113-card avoid"><h4>✕ YENİLMEMESİ GEREKEN YİYECEKLER</h4><div class="iy113-text" data-kind="a"></div></div>
+ </div>
+ <div class="iy113-own"><b>KENDİ ÖNERİLERİM / DANIŞANA ÖZEL NOTLAR</b><div class="iy113-rows"></div></div>`;
+ box.querySelector('[data-kind="f"]').innerText=get(K.f,FREE);
+ box.querySelector('[data-kind="a"]').innerText=get(K.a,AVOID);
+ renderRows(box);
+
+ box.querySelector("[data-edit]").onclick=()=>box.querySelectorAll(".iy113-text").forEach(x=>x.contentEditable=x.contentEditable==="true"?"false":"true");
+ box.querySelector("[data-add]").onclick=()=>{let a=custom();a.push("");saveCustom(a);renderRows(box)};
+ box.querySelector("[data-save]").onclick=function(){
+   set(K.f,box.querySelector('[data-kind="f"]').innerText.trim());
+   set(K.a,box.querySelector('[data-kind="a"]').innerText.trim());
+   saveCustom([...box.querySelectorAll(".iy113-row input")].map(x=>x.value.trim()).filter(Boolean));
+   renderRows(box);box.querySelectorAll(".iy113-text").forEach(x=>x.contentEditable="false");
+   this.textContent="✓ Kaydedildi";setTimeout(()=>this.textContent="💾 Kaydet",1000);
+ };
+ box.querySelector("[data-print]").onclick=()=>{
+   box.querySelector("[data-save]").click();
+   if(typeof window.showSection==="function")window.showSection("reports");
+   setTimeout(()=>{
+     const btn=document.getElementById("iy35PreviewBtn"); if(btn)btn.click();
+     setTimeout(()=>window.print(),250);
+   },300);
+ };
+ return box;
+}
+
+function ensureVisible(){
+ const table=document.getElementById("menuTable");if(!table)return;
+ let box=document.getElementById("iy113Advice");
+ if(!box)box=build();
+ // Always place INSIDE menuTable after generated menu content, so redraws cannot hide it elsewhere.
+ if(box.parentNode!==table)table.appendChild(box);
+ if(table.lastElementChild!==box)table.appendChild(box);
+}
+
+function wrapV65Print(){
+ if(typeof window.v65WeeklyPrintHtml!=="function" || window.v65WeeklyPrintHtml.__iy113)return;
+ const old=window.v65WeeklyPrintHtml;
+ const wrapped=function(){
+   const html=old.apply(this,arguments);
+   return html + printHtml();
+ };
+ wrapped.__iy113=true;
+ window.v65WeeklyPrintHtml=wrapped;
+}
+
+function watchPrintPreview(){
+ const p=document.getElementById("iy35Preview");
+ if(!p || p.__iy113)return;
+ p.__iy113=true;
+ const add=()=>{
+   if(!p.querySelector(".iy113-print"))p.insertAdjacentHTML("beforeend",printHtml());
+ };
+ new MutationObserver(()=>setTimeout(add,20)).observe(p,{childList:true,subtree:false});
+ add();
+}
+
+function install(){
+ wrapV65Print();
+ ensureVisible();
+ watchPrintPreview();
+
+ const table=document.getElementById("menuTable");
+ if(table && !table.__iy113){
+  table.__iy113=true;
+  new MutationObserver(()=>setTimeout(ensureVisible,25)).observe(table,{childList:true,subtree:false});
+ }
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(install,900));
+else setTimeout(install,900);
+setInterval(install,1500);
+})();
+</script>
+
+
+<style id="iy-v114-advice-style">
+#iy114AdviceHost{display:block!important;margin-top:16px}
+#iy114Advice{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ padding:18px;border:1px solid #d8cfb6;border-radius:12px;background:#fbf8f2;
+ box-shadow:0 6px 18px rgba(30,63,58,.06)
+}
+.iy114-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px}
+.iy114-head h3{margin:0;color:#1e3f3a;font-size:17px}.iy114-head p{margin:3px 0 0;color:#6b6455;font-size:11.5px}
+.iy114-actions{display:flex;gap:7px;flex-wrap:wrap}
+.iy114-actions button{border:1px solid #d8cfb6;background:#fff;color:#1e3f3a;border-radius:8px;padding:8px 10px;font-weight:800;font-size:12px;cursor:pointer}
+.iy114-actions .save,.iy114-actions .print{background:#1e3f3a;color:#fff;border-color:#1e3f3a}
+.iy114-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.iy114-card{background:#fff;border:1px solid #e3dccb;border-radius:10px;padding:14px}
+.iy114-card.free{border-left:4px solid #2f9e8f}.iy114-card.avoid{border-left:4px solid #a5452f}
+.iy114-card h4{margin:0 0 8px;font-size:13px}.iy114-card.free h4{color:#2f6259}.iy114-card.avoid h4{color:#a5452f}
+.iy114-text{white-space:pre-line;line-height:1.65;font-size:12.5px;color:#514d43;min-height:80px}
+.iy114-text[contenteditable=true]{padding:8px;border-radius:8px;outline:2px solid #b8d8c9;background:#fff}
+.iy114-own{margin-top:12px;padding:13px;background:#fff;border:1px dashed #d8cfb6;border-radius:10px}
+.iy114-own-title{font-weight:900;font-size:12px;color:#2f6259}
+.iy114-row{display:flex;gap:7px;margin-top:7px}.iy114-row input{flex:1;padding:9px 10px;border:1px solid #d8cfb6;border-radius:8px;font:inherit}
+.iy114-row button{width:34px;border:0;border-radius:8px;background:#f7ece9;color:#a5452f;cursor:pointer}
+.iy114-note{margin-top:9px;font-size:10.5px;color:#857e70}
+@media(max-width:720px){.iy114-grid{grid-template-columns:1fr}}
+@media print{
+ #iy114Advice{box-shadow:none!important;background:#fff!important;break-inside:avoid}
+ #iy114Advice .no-print{display:none!important}
+ .iy114-grid{grid-template-columns:1fr 1fr!important}
+}
+</style>
+
+<script id="iy-v114-advice-script">
+(function(){
+"use strict";
+const FREE=`Açık çay
+Ihlamur
+Salça
+Suni tatlandırıcılar (günde 5–6 adet)`;
+
+const AVOID=`Şeker ve şekerli tatlılar, bal, reçel, pekmez, marmelat, şurup
+Hamur işleri: börek, çörek, pasta, kek, kurabiye, çikolata
+Alkollü içecekler ve meşrubatlar, tahin ve tahin helvası
+Yağda kızartılmış, kavrulmuş ve sos ilave edilmiş yiyecekler
+Kuru yemişler, hazır meyve suları, sigara
+Sucuk, pastırma, salam, sosis
+Bütün yağlı yiyecekler (yağlı etler, krema vb.)
+Terkibi bilinmeyen hazır gıdalar
+Listede belirtilmemiş olan her türlü yiyecekler
+Margarin, tereyağı, kuyruk yağı, iç yağ
+Sakatatlar (karaciğer, beyin, böbrek vb.)
+Önerilenden fazla tuz ve tuzlu yiyecekler (salamura, turşu, konserve vb.)`;
+
+const K={f:"iy114_free",a:"iy114_avoid",c:"iy114_custom"};
+function get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}}
+function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function customs(){try{return JSON.parse(localStorage.getItem(K.c)||"[]")}catch(e){return[]}}
+function setCustom(a){try{localStorage.setItem(K.c,JSON.stringify(a))}catch(e){}}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+
+window.iy114PrintAdviceHtml=function(){
+ const free=get(K.f,FREE).split("\n").map(x=>x.trim()).filter(Boolean);
+ const avoid=get(K.a,AVOID).split("\n").map(x=>x.replace(/^•\s*/,"").trim()).filter(Boolean);
+ const own=customs().filter(Boolean);
+ return `<section style="page-break-before:always">
+ <h3>Öneriler & Beslenme Notları</h3>
+ <div style="border:1px solid #D8CFB6;padding:12px;margin:8px 0">
+   <b>SERBEST YİYECEKLER</b><ul>${free.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </div>
+ <div style="border:1px solid #D8CFB6;padding:12px;margin:8px 0">
+   <b>YENİLMEMESİ GEREKEN YİYECEKLER</b><ul>${avoid.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ </div>
+ ${own.length?`<div style="border:1px solid #D8CFB6;padding:12px;margin:8px 0"><b>DANIŞANA ÖZEL NOTLAR</b><ul>${own.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+ </section>`;
+};
+
+function rows(box){
+ const host=box.querySelector(".iy114-rows");host.innerHTML="";
+ customs().forEach((v,i)=>{
+   const r=document.createElement("div");r.className="iy114-row";
+   const x=document.createElement("input");x.value=v;x.placeholder="Danışana özel öneri / yeni madde...";
+   const d=document.createElement("button");d.type="button";d.textContent="×";d.title="Sil";
+   d.onclick=()=>{let a=customs();a.splice(i,1);setCustom(a);rows(box)};
+   r.append(x,d);host.appendChild(r);
+ });
+}
+function build(){
+ const box=document.createElement("section");box.id="iy114Advice";
+ box.innerHTML=`<div class="iy114-head">
+   <div><h3>📌 Öneriler & Beslenme Notları</h3><p>Bu alan Menü Stüdyosu'nun kalıcı parçasıdır ve 7 günlük yazdırma çıktısına eklenir.</p></div>
+   <div class="iy114-actions no-print">
+    <button type="button" data-edit>✏️ Düzenle</button>
+    <button type="button" data-add>＋ Yeni Madde Ekle</button>
+    <button type="button" class="save" data-save>💾 Kaydet</button>
+    <button type="button" class="print" data-print>🖨️ 7 Günlük Menü + Öneriler</button>
+   </div>
+ </div>
+ <div class="iy114-grid">
+   <div class="iy114-card free"><h4>✓ SERBEST YİYECEKLER</h4><div class="iy114-text" data-k="f"></div></div>
+   <div class="iy114-card avoid"><h4>✕ YENİLMEMESİ GEREKEN YİYECEKLER</h4><div class="iy114-text" data-k="a"></div></div>
+ </div>
+ <div class="iy114-own"><div class="iy114-own-title">KENDİ ÖNERİLERİM / DANIŞANA ÖZEL NOTLAR</div><div class="iy114-rows"></div><div class="iy114-note">İleride istediğin kadar yeni madde ekleyebilir, silebilir ve düzenleyebilirsin.</div></div>`;
+
+ box.querySelector('[data-k="f"]').innerText=get(K.f,FREE);
+ box.querySelector('[data-k="a"]').innerText=get(K.a,AVOID);
+ rows(box);
+
+ box.querySelector("[data-edit]").onclick=()=>box.querySelectorAll(".iy114-text").forEach(x=>x.contentEditable=x.contentEditable==="true"?"false":"true");
+ box.querySelector("[data-add]").onclick=()=>{let a=customs();a.push("");setCustom(a);rows(box)};
+ box.querySelector("[data-save]").onclick=function(){
+   set(K.f,box.querySelector('[data-k="f"]').innerText.trim());
+   set(K.a,box.querySelector('[data-k="a"]').innerText.trim());
+   setCustom([...box.querySelectorAll(".iy114-row input")].map(x=>x.value.trim()).filter(Boolean));
+   rows(box);box.querySelectorAll(".iy114-text").forEach(x=>x.contentEditable="false");
+   this.textContent="✓ Kaydedildi";setTimeout(()=>this.textContent="💾 Kaydet",1000);
+ };
+ box.querySelector("[data-print]").onclick=()=>{
+   box.querySelector("[data-save]").click();
+   const realPrint=document.getElementById("v66Print");
+   if(realPrint) realPrint.click();
+   else alert("Önce 7 günlük menüyü oluşturun.");
+ };
+ return box;
+}
+function install(){
+ const host=document.getElementById("iy114AdviceHost");
+ if(!host)return false;
+ if(!host.querySelector("#iy114Advice"))host.appendChild(build());
+ return true;
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(install,650));
+else setTimeout(install,650);
+setInterval(install,1000);
 })();
 </script>
