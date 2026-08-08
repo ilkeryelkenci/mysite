@@ -5673,10 +5673,27 @@ input[type=checkbox],input[type=radio]{accent-color:var(--iy132-navy)}
 @media(max-width:900px){
   #iy132MenuBtn{display:flex}
   #iy75Sidebar{
-    position:fixed!important;top:0!important;left:0!important;height:100vh!important;width:280px!important;
-    transform:translateX(-104%)!important;z-index:9999!important;
+    position:fixed!important;top:64px!important;left:8px!important;right:8px!important;width:auto!important;
+    height:auto!important;max-height:calc(100vh - 84px)!important;overflow-y:auto!important;
+    border-radius:16px!important;z-index:9999!important;
+    padding:10px 10px 14px!important;
+    transform:translateY(-14px)!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+    transition:transform .24s var(--iy132-ease),opacity .2s ease,visibility 0s linear .24s!important;
+    box-shadow:var(--iy132-sh-lg)!important;
   }
-  body.iy132-nav-open #iy75Sidebar{transform:translateX(0)!important}
+  body.iy132-nav-open #iy75Sidebar{
+    transform:translateY(0)!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+    transition:transform .24s var(--iy132-ease),opacity .2s ease,visibility 0s!important;
+  }
+  /* Küçük ekranda çekmece içinde marka bloğu yer kaplamasın, sadece menü listesi kalsın */
+  #iy75Sidebar .iy75-brand{padding:8px 6px 4px}
+  #iy75Sidebar .iy75-seal{width:44px;height:44px;font-size:20px}
+  #iy75Sidebar .iy75-brand h2{font-size:13px}
+  #iy75Sidebar .iy75-profile{display:none!important}
+  #iy75Sidebar .iy75-package{margin-top:8px}
+  /* Menü öğeleri: alt alta, tek sütun, kendi içinde kaydırmaya gerek kalmadan tüm liste görünür */
+  #iy75Nav{display:flex;flex-direction:column;gap:2px}
+  #iy75Nav button{padding:11px 12px!important;font-size:13px!important}
   #iy75Top{padding-left:64px!important}
   .app>main{padding-top:96px!important}
 }
